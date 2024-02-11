@@ -41,5 +41,13 @@ int main() {
     }
     printf("Socket successfully bound to address\n");
 
+    // Listen for incoming connections
+    if (listen(sockfd, SOMAXCONN) != 0) {
+        perror("[ERR] Webserver (Listen)");
+        return 1;
+    }
+    printf("Server listening for connections\n");
+
+
     return 0;
 }
