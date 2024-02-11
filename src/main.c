@@ -17,16 +17,29 @@ int main() {
         // Exit program with error
         return 1;
     }
-    printf("Socket created successfully");
+    printf("Socket created successfully\n");
 
-    /* Socket address for this host.
-       Look in: man 7 ip for struct. */
-    // struct sockaddr_in hostaddr;
-    // hostaddr.sin_family = AF_INET; // required
-    // hostaddr.sin_port = htons(PORT)
+    struct sockaddr_in host_addr;
+    int host_addrlen = sizeof(host_addr);
 
+    host_addr.sin_family = AF_INET; // Required
+    /* Convert host binary representation of port to network representation 
+       (networking is big endian, host might be little). 
+       Recall: 1 in big endian is 0 0 0 1 vs. 1 0 0 0 in little endian */
+    host_addr.sin_port = htons(PORT);
 
-    // bind(sockfd, )
+    /* INADDR_ANY accepts messages from any network adapter.
+       It translates to 0.0.0.0 */
+    struct in_addr host_sin_addr;
+    host_sin_addr.s_addr = htonl(INADDR_ANY);
+    host_addr.sin_addr.s_addr; 
+
+    // Bind socket to the address
+    if (bind(sockfd, (struct sockaddr *)&host_addr, host_addrlen) != 0) {
+        perror("[ERR] Webserver (Bind)");
+        return 1;
+    }
+    printf("Socket successfully bound to address\n");
 
     return 0;
 }
