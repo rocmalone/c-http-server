@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
+#include <unistd.h>
 
 #define PORT 8080
 
@@ -34,7 +35,9 @@ int main() {
     host_sin_addr.s_addr = htonl(INADDR_ANY);
     host_addr.sin_addr.s_addr; 
 
-    // Bind socket to the address
+    /* Bind socket to the address 
+       (struct sockaddr *)&host_addr casts the mem addr of host_addr (type 
+       sockaddr_in) to a pointer to a sockaddr */
     if (bind(sockfd, (struct sockaddr *)&host_addr, host_addrlen) != 0) {
         perror("[ERR] Webserver (Bind)");
         return 1;
@@ -47,6 +50,22 @@ int main() {
         return 1;
     }
     printf("Server listening for connections\n");
+
+    // Infinite loop
+    for(;;) {
+        // Await incoming connections and accept them
+        int newsockfd = accept(sockfd, (struct sockaddr *)&host_addr,
+                                (socklen_t *)&host_addrlen);
+
+        // Display error then keep accepting connections
+        if (newsockfd < 0) {
+            perror("[ERR] Webserver (Accept)");
+            continue;
+        }
+
+        printf("Connection accepted\n");
+        close(newsockfd);
+    }
 
 
     return 0;
